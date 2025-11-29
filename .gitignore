@@ -25,7 +25,7 @@
 !*.nix
 !flake.lock
 
-# !Makefile
+!justfile
 
 # ...even if they are in subdirectories
 !*/
