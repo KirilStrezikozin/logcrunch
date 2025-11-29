@@ -1,0 +1,59 @@
+version: "2"
+run:
+  tests: true
+linters:
+  enable:
+    - bodyclose
+    - copyloopvar
+    - decorder
+    - exhaustive
+    - goconst
+    - godot
+    - godox
+    - gomoddirectives
+    - goprintffuncname
+    - gosec
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - perfsprint
+    - prealloc
+    - predeclared
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - tparallel
+    - unconvert
+    - unparam
+    - whitespace
+    - wrapcheck
+  settings:
+    copyloopvar:
+      check-alias: true
+    nilnil:
+      detect-opposite: true
+  exclusions:
+    generated: lax
+    presets:
+      - common-false-positives
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
