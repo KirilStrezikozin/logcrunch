@@ -12,6 +12,8 @@
 !/.editorconfig
 !.golangci.yaml
 
+!.github/CODEOWNERS
+
 !*.go
 !go.sum
 !go.mod
