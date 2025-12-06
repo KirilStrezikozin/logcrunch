@@ -60,6 +60,9 @@ func main() {
 		})
 		if err != nil {
 			logger.Error().Err(err).Msg("read")
+			if err := c.Close(); err != nil {
+				logger.Error().Err(err).Msg("close")
+			}
 		}
 	}()
 

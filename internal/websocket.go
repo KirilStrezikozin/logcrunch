@@ -29,7 +29,7 @@ type WebSocketClient struct {
 	done   chan struct{}
 
 	HandshakeTimeout time.Duration
-	CloseTimeout     time.Duration
+	WriteTimeout     time.Duration
 }
 
 func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClient {
@@ -43,8 +43,8 @@ func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClie
 		url:    url,
 		done:   make(chan struct{}),
 
-		HandshakeTimeout: 5 * time.Second,
-		CloseTimeout:     5 * time.Second,
+		HandshakeTimeout: 10 * time.Second,
+		WriteTimeout:     10 * time.Second,
 	}
 }
 
@@ -54,7 +54,6 @@ func (c *WebSocketClient) Dial() error {
 	}
 
 	dialer := websocket.Dialer{
-		Proxy:            nil,
 		HandshakeTimeout: c.HandshakeTimeout,
 	}
 
@@ -91,16 +90,12 @@ func (c *WebSocketClient) Close() error {
 	}
 
 	msg := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")
+	c.conn.SetWriteDeadline(time.Now().Add(c.WriteTimeout))
 	if err := c.conn.WriteMessage(websocket.CloseMessage, msg); err != nil {
 		return &WebSocketError{Op: "close", Err: err}
 	}
 
-	select {
-	case <-c.done:
-	case <-time.After(c.CloseTimeout):
-		c.logger.Debug().Msg("closing connection: server reply timeout")
-	}
-
+	<-c.done
 	if err := c.conn.Close(); err != nil {
 		return &WebSocketError{Op: "close", Err: err}
 	}
