@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/KirilStrezikozin/logcrunch/internal"
@@ -17,6 +18,11 @@ import (
 
 var upgrader = websocket.Upgrader{HandshakeTimeout: 10 * time.Second}
 
+const pongWait = 10 * time.Second
+const pingPeriod = (pongWait * 9) / 10
+const maxMessageSize = 1 << 14
+const writeWait = 10 * time.Second
+
 func ws(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -25,21 +31,25 @@ func ws(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
+	log.Print("new conn")
+
+	c.SetReadLimit(maxMessageSize)
+	c.SetReadDeadline(time.Now().Add(pongWait))
+	c.SetPongHandler(func(_ string) error {
+		log.Printf("pong received")
+		c.SetReadDeadline(time.Now().Add(pongWait))
+		return nil
+	})
 
 	sendTicker := time.NewTicker(5 * time.Second)
+	pingTicker := time.NewTicker(pingPeriod)
+
 	defer sendTicker.Stop()
+	defer pingTicker.Stop()
 
 	done := make(chan struct{})
 	msgs := make(chan []byte, 100)
-
-	s := internal.NewStore(10)
-	s.AddLog(internal.Log{ID: "1", Message: "Hello, World!"})
-	s.AddLog(internal.Log{ID: "2", Message: "Hello, World!"})
-	s.AddLog(internal.Log{ID: "3", Message: "Hello, World!"})
-	s.AddLog(internal.Log{ID: "4", Message: "Hello, World!"})
-	s.AddLog(internal.Log{ID: "5", Message: "Hello, World!"})
+	lastLogID := -1
 
 	go func() {
 		defer close(done)
@@ -56,21 +66,25 @@ func ws(w http.ResponseWriter, r *http.Request) {
 	for {
 		select {
 		case <-done:
+			log.Println("closing")
 			return
 		case msg := <-msgs:
-			err = c.WriteMessage(websocket.TextMessage, msg)
-			if err != nil {
+			c.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.WriteMessage(websocket.TextMessage, msg); err != nil {
 				log.Println("write:", err)
 				return
 			}
-		case <-ticker.C:
-			msgs <- []byte("ping")
-		case <-sendTicker.C:
-			logs := s.GetUnreadLogs(1)
-			if len(logs) == 0 {
-				continue
+		case <-pingTicker.C:
+			c.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := c.WriteMessage(websocket.PingMessage, nil); err != nil {
+				log.Println("ping:", err)
+				return
 			}
-			msg, err := logs[0].MarshalJSON()
+			log.Println("ping sent")
+		case <-sendTicker.C:
+			lastLogID++
+			newLog := internal.Log{ID: internal.LogID(strconv.Itoa(lastLogID)), Message: "New log message"}
+			msg, err := newLog.MarshalJSON()
 			if err != nil {
 				log.Println("marshal:", err)
 				return
