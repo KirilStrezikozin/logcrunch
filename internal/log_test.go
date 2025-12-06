@@ -16,9 +16,9 @@ func TestNewLog_Unmarshal(t *testing.T) {
 		"timestamp": 123456,
 		"level": "info",
 		"message": "hello world",
-		"namespace": "main",
-		"class_name": "Logger",
-		"function_name": "TestFunc",
+		"source_file": "main",
+		"source_line": 11,
+		"source_function": "Class.TestFunc",
 		"function_call_started_at": 100.0,
 		"function_call_ended_at": 200.0,
 		"function_duration": 100.0,
@@ -40,12 +40,11 @@ func TestNewLog_Unmarshal(t *testing.T) {
 	assert.Equal(t, Timestamp(123456), log.Timestamp)
 	assert.Equal(t, "info", log.Level)
 	assert.Equal(t, "hello world", log.Message)
-	assert.Equal(t, "main", log.Namespace)
-	assert.Equal(t, "Logger", log.ClassName)
-	assert.Equal(t, "TestFunc", log.FunctionName)
+	assert.Equal(t, "main", log.SourceFile)
+	assert.Equal(t, 11, log.SourceLine)
+	assert.Equal(t, "Class.TestFunc", log.SourceFunction)
 	assert.Equal(t, Timestamp(100), log.FunctionCallStartedAt)
 	assert.Equal(t, Timestamp(200), log.FunctionCallEndedAt)
-	assert.Equal(t, float64(100), log.FunctionDuration)
 	assert.Equal(t, []LogID{"log0"}, log.FunctionCallStack)
 
 	assert.Equal(t, "alice", log.Attrs["user"])

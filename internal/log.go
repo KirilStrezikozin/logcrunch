@@ -9,9 +9,11 @@ import (
 	"fmt"
 )
 
-type LogID string
-type Timestamp float64
-type LogType int
+type (
+	LogID     string
+	Timestamp float64
+	LogType   int
+)
 
 const (
 	LogTypeInfo LogType = iota + 1
@@ -25,15 +27,14 @@ type Log struct {
 	Message   string    `json:"message"`
 
 	// Where the log was generated.
-	Namespace    string `json:"namespace,omitempty"`
-	ClassName    string `json:"class_name,omitempty"`
-	FunctionName string `json:"function_name,omitempty"`
+	SourceFile     string `json:"source_file,omitempty"`
+	SourceLine     int    `json:"source_line,omitempty"`
+	SourceFunction string `json:"source_function,omitempty"`
 
 	// Only relevant for logs that describe function calls
 	// and include performance data.
 	FunctionCallStartedAt Timestamp `json:"function_call_started_at,omitempty"`
 	FunctionCallEndedAt   Timestamp `json:"function_call_ended_at,omitempty"`
-	FunctionDuration      float64   `json:"function_duration,omitempty"`
 
 	// Call stack leading to the log describing a function call.
 	FunctionCallStack []LogID `json:"call_stack,omitempty"`
@@ -71,12 +72,11 @@ func (l *Log) parseAttrs() {
 	parsed["timestamp"] = l.Timestamp
 	parsed["level"] = l.Level
 	parsed["message"] = l.Message
-	parsed["namespace"] = l.Namespace
-	parsed["class_name"] = l.ClassName
-	parsed["function_name"] = l.FunctionName
+	parsed["source_file"] = l.SourceFile
+	parsed["source_line"] = l.SourceLine
+	parsed["source_function"] = l.SourceFunction
 	parsed["function_call_started_at"] = l.FunctionCallStartedAt
 	parsed["function_call_ended_at"] = l.FunctionCallEndedAt
-	parsed["function_duration"] = l.FunctionDuration
 	parsed["call_stack"] = nil
 
 	parseAttrsRecursive(l.Attrs, parsed, "attrs")
