@@ -30,6 +30,7 @@ func main() {
 	serveHost := os.Getenv("LOGCRUNCH_SERVE_HOST")
 	servePort := os.Getenv("LOGCRUNCH_SERVE_PORT")
 
+	reconnect := make(chan struct{})
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
@@ -42,32 +43,31 @@ func main() {
 	c := internal.NewWebSocketClient(url, logger)
 	s := internal.NewStore(1000)
 
-	if err := c.Dial(); err != nil {
-		logger.Fatal().Err(err).Msg("dial failed")
-	}
-
-	defer func() {
-		<-c.Done()
-		logger.Info().Msg("websocket client exited normally")
-	}()
-
-	go func() {
-		err := c.Read(func(data []byte) {
+	readLoop := func() error {
+		return c.Read(func(data []byte) {
 			log, err := internal.NewLog(data)
 			if err != nil {
 				logger.Error().Err(err).Msg("invalid log data")
 				return
 			}
-			s.AddLog(log)
+
 			logger.Info().Str("id", string(log.ID)).Msg("log received")
+			s.AddLog(log)
 		})
-		if err != nil {
-			logger.Error().Err(err).Msg("read")
-			if err := c.Close(); err != nil {
-				logger.Error().Err(err).Msg("close")
-			}
+	}
+
+	doReconnect := func() {
+		defer func() { reconnect <- struct{}{} }()
+
+		if err := c.Dial(); err != nil {
+			logger.Error().Err(err).Msg("dial failed")
+			return
 		}
-	}()
+
+		if err := readLoop(); err != nil {
+			logger.Error().Err(err).Msg("read")
+		}
+	}
 
 	reqLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{
 		Logger: &logger,
@@ -106,18 +106,39 @@ func main() {
 		}
 	}()
 
-	<-interrupt
-	logger.Info().Msg("interrupt")
+	go doReconnect() // initial connect
 
-	if err := c.Close(); err != nil {
-		logger.Error().Err(err).Msg("websocket client close")
-	}
+	defer func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := server.Shutdown(ctx); err != nil {
+			logger.Error().Err(err).Msg("serve shutdown")
+		} else {
+			logger.Info().Msg("serve clean shutdown")
+		}
+	}()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := server.Shutdown(ctx); err != nil {
-		logger.Error().Err(err).Msg("serve shutdown")
-	} else {
-		logger.Info().Msg("serve clean shutdown")
+	for {
+		select {
+		case <-interrupt:
+			logger.Info().Msg("interrupt")
+			if err := c.Close(); err != nil {
+				logger.Error().Err(err).Msg("websocket client close")
+			}
+			<-reconnect // wait for the reconnect go-routine to exit
+			return
+		case <-reconnect:
+			if err := c.Close(); err != nil {
+				logger.Error().Err(err).Msg("websocket client close")
+			}
+			logger.Info().Msgf("(re)connecting to %s in 3 seconds...", url.String())
+			select {
+			case <-interrupt:
+				logger.Info().Msg("reconnect cancelled due to interrupt")
+				return
+			case <-time.After(3 * time.Second):
+				go doReconnect()
+			}
+		}
 	}
 }

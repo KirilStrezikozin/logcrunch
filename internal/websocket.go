@@ -26,7 +26,6 @@ type WebSocketClient struct {
 	url    url.URL
 	conn   *websocket.Conn
 	logger zerolog.Logger
-	done   chan struct{}
 
 	HandshakeTimeout time.Duration
 	WriteTimeout     time.Duration
@@ -42,7 +41,6 @@ func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClie
 	return &WebSocketClient{
 		logger: logger,
 		url:    url,
-		done:   make(chan struct{}),
 
 		HandshakeTimeout: 10 * time.Second,
 		WriteTimeout:     10 * time.Second,
@@ -77,7 +75,6 @@ func (c *WebSocketClient) Read(onRead func([]byte)) error {
 		return &WebSocketError{Op: "read", Err: ErrNilConnection}
 	}
 
-	defer close(c.done)
 	for {
 		_, msg, err := c.conn.ReadMessage()
 		if err != nil {
@@ -100,15 +97,11 @@ func (c *WebSocketClient) Close() error {
 		return &WebSocketError{Op: "close", Err: err}
 	}
 
-	<-c.done
 	if err := c.conn.Close(); err != nil {
 		return &WebSocketError{Op: "close", Err: err}
 	}
 
 	c.logger.Info().Msg("connection closed")
+	c.conn = nil
 	return nil
-}
-
-func (c *WebSocketClient) Done() <-chan struct{} {
-	return c.done
 }
