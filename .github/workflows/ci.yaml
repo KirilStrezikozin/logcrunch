@@ -10,7 +10,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  golangci:
+  ci:
     strategy:
       matrix:
         go: [1.24.x]
