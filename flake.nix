@@ -30,17 +30,22 @@
           packages = with pkgs; [
             go
             golangci-lint
+            tailwindcss_4
             templ
             just
+            air
+            pre-commit
 
             nixd
             gopls
             golangci-lint-langserver
+            htmx-lsp
             tree
 
             nixfmt-rfc-style
 
             nodejs_latest
+            watchman
           ];
         };
 

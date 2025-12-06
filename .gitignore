@@ -20,6 +20,7 @@
 !*.go
 !*.templ
 !*.js
+!*.css
 !go.sum
 !go.mod
 
