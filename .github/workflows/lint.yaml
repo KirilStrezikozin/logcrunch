@@ -24,3 +24,10 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.6
+
+      - name: Install templ
+        run: go install github.com/a-h/templ/cmd/templ@v0.3.865
+
+      - name: Run Template Formatter
+        run: |
+          templ fmt . -fail
