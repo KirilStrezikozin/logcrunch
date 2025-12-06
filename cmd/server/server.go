@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/KirilStrezikozin/logcrunch/internal"
 	"github.com/gorilla/websocket"
 )
 
@@ -28,7 +29,18 @@ func ws(w http.ResponseWriter, r *http.Request) {
 	ticker := time.NewTicker(1 * time.Second)
 	defer ticker.Stop()
 
+	sendTicker := time.NewTicker(5 * time.Second)
+	defer sendTicker.Stop()
+
 	done := make(chan struct{})
+	msgs := make(chan []byte, 100)
+
+	s := internal.NewStore(10)
+	s.AddLog(internal.Log{ID: "1", Message: "Hello, World!"})
+	s.AddLog(internal.Log{ID: "2", Message: "Hello, World!"})
+	s.AddLog(internal.Log{ID: "3", Message: "Hello, World!"})
+	s.AddLog(internal.Log{ID: "4", Message: "Hello, World!"})
+	s.AddLog(internal.Log{ID: "5", Message: "Hello, World!"})
 
 	go func() {
 		defer close(done)
@@ -46,12 +58,25 @@ func ws(w http.ResponseWriter, r *http.Request) {
 		select {
 		case <-done:
 			return
-		case <-ticker.C:
-			err = c.WriteMessage(websocket.TextMessage, []byte("tick"))
+		case msg := <-msgs:
+			err = c.WriteMessage(websocket.TextMessage, msg)
 			if err != nil {
 				log.Println("write:", err)
 				return
 			}
+		case <-ticker.C:
+			msgs <- []byte("ping")
+		case <-sendTicker.C:
+			logs := s.GetUnreadLogs(1)
+			if len(logs) == 0 {
+				continue
+			}
+			msg, err := logs[0].MarshalJSON()
+			if err != nil {
+				log.Println("marshal:", err)
+				return
+			}
+			msgs <- msg
 		}
 	}
 }

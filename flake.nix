@@ -29,13 +29,15 @@
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
             go
-            gopls
             golangci-lint
-            golangci-lint-langserver
-
+            templ
             just
 
             nixd
+            gopls
+            golangci-lint-langserver
+            tree
+
             nixfmt-rfc-style
 
             nodejs_latest

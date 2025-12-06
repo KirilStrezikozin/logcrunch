@@ -1,0 +1,9 @@
+package templates
+
+import "github.com/KirilStrezikozin/logcrunch/internal"
+
+templ Logs(logs []internal.Log) {
+	for _, log := range logs {
+		@Log(log)
+	}
+}

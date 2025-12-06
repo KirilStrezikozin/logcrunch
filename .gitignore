@@ -16,6 +16,8 @@
 !.github/CODEOWNERS
 
 !*.go
+!*.templ
+!*.js
 !go.sum
 !go.mod
 
