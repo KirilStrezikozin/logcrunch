@@ -9,11 +9,13 @@
 
 # But not these files...
 !/.gitignore
+!/.gitattributes
 !/.editorconfig
 !.golangci.yaml
 !.env.sample
 
 !.github/CODEOWNERS
+!.github/**/*.yaml
 
 !*.go
 !*.templ
