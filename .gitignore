@@ -16,6 +16,7 @@
 
 !.github/CODEOWNERS
 !.github/**/*.yaml
+!.pre-commit-config.yaml
 
 !*.go
 !*.templ

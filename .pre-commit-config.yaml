@@ -1,0 +1,30 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: forbid-new-submodules
+      - id: trailing-whitespace
+  - repo: https://github.com/dnephin/pre-commit-golang
+    rev: master
+    hooks:
+      # - id: golangci-lint
+      - id: go-mod-tidy
+  - repo: local
+    hooks:
+      - id: templ-format
+        name: Format Templ files
+        entry: templ fmt
+        language: system
+        types: [templ]
+      - id: templ-gen
+        name: Generate Templ templates
+        entry: templ generate
+        language: system
+        types: [templ]
