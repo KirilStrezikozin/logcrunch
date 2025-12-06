@@ -6,7 +6,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,21 +17,24 @@ import (
 	"github.com/a-h/templ"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	_ "github.com/joho/godotenv/autoload"
 
 	"github.com/rs/zerolog"
 )
 
-var addr = flag.String("source", "localhost:7779", "websocket source address")
-var addrServe = flag.String("addr", "localhost:7780", "http service address")
-
 func main() {
-	flag.Parse()
+	sourceScheme := os.Getenv("LOGCRUNCH_SOURCE_SCHEME")
+	sourceHost := os.Getenv("LOGCRUNCH_SOURCE_HOST")
+	sourcePort := os.Getenv("LOGCRUNCH_SOURCE_PORT")
+	sourcePath := os.Getenv("LOGCRUNCH_SOURCE_PATH")
+	serveHost := os.Getenv("LOGCRUNCH_SERVE_HOST")
+	servePort := os.Getenv("LOGCRUNCH_SERVE_PORT")
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	url := url.URL{Scheme: "ws", Host: *addr, Path: "/ws"}
-	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout}).With().Timestamp().Logger()
+	url := url.URL{Scheme: sourceScheme, Host: sourceHost + ":" + sourcePort, Path: sourcePath}
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "2006/01/02 15:04:05"}).With().Timestamp().Logger()
 
 	c := internal.NewWebSocketClient(url, logger)
 	s := internal.NewStore(1000)
@@ -81,14 +83,14 @@ func main() {
 	r.Handle("/", templ.Handler(homeComponent))
 
 	server := http.Server{
-		Addr:         *addrServe,
+		Addr:         serveHost + ":" + servePort,
 		Handler:      r,
 		WriteTimeout: 10 * time.Second,
 		ReadTimeout:  10 * time.Second,
 	}
 
 	go func() {
-		logger.Info().Msgf("starting HTTP server at %s", *addrServe)
+		logger.Info().Msgf("starting HTTP server at %s:%s", serveHost, servePort)
 		if err := server.ListenAndServe(); err != nil {
 			logger.Error().Err(err).Msg("serve")
 		}

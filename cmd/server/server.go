@@ -5,16 +5,15 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/KirilStrezikozin/logcrunch/internal"
 	"github.com/gorilla/websocket"
+	_ "github.com/joho/godotenv/autoload"
 )
-
-var addr = flag.String("addr", "localhost:7779", "http service address")
 
 var upgrader = websocket.Upgrader{HandshakeTimeout: 10 * time.Second}
 
@@ -82,11 +81,13 @@ func ws(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
-	http.HandleFunc("/ws", ws)
+	sourceHost := os.Getenv("LOGCRUNCH_SOURCE_HOST")
+	sourcePort := os.Getenv("LOGCRUNCH_SOURCE_PORT")
+	sourcePath := os.Getenv("LOGCRUNCH_SOURCE_PATH")
+
+	http.HandleFunc(sourcePath, ws)
 	log.Fatal(func() error {
-		server := &http.Server{Addr: *addr, Handler: nil, WriteTimeout: 10 * time.Second, ReadTimeout: 10 * time.Second}
+		server := &http.Server{Addr: sourceHost + ":" + sourcePort, Handler: nil, WriteTimeout: 10 * time.Second, ReadTimeout: 10 * time.Second}
 		return server.ListenAndServe()
 	}())
 }
