@@ -24,6 +24,7 @@
 !*.css
 !go.sum
 !go.mod
+!.air.toml
 
 !README.md
 !LICENSE
