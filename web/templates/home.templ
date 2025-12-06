@@ -1,0 +1,13 @@
+package templates
+
+templ Home(title string) {
+	@Layout(title) {
+		<h1>{ title }</h1>
+		<div
+			id="logs"
+			hx-get="/unread"
+			hx-trigger="every 1s"
+			hx-swap="afterbegin"
+		></div>
+	}
+}
