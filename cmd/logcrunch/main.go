@@ -34,7 +34,10 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt)
 
 	url := url.URL{Scheme: sourceScheme, Host: sourceHost + ":" + sourcePort, Path: sourcePath}
-	logger := zerolog.New(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: "2006/01/02 15:04:05"}).With().Timestamp().Logger()
+	logger := zerolog.New(zerolog.ConsoleWriter{
+		Out:        os.Stdout,
+		TimeFormat: time.RFC3339,
+	}).With().Timestamp().Logger()
 
 	c := internal.NewWebSocketClient(url, logger)
 	s := internal.NewStore(1000)
@@ -66,8 +69,12 @@ func main() {
 		}
 	}()
 
+	reqLogger := middleware.RequestLogger(&middleware.DefaultLogFormatter{
+		Logger: &logger,
+	})
+
 	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r.Use(reqLogger)
 
 	fs := http.FileServer(http.Dir("web/static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
