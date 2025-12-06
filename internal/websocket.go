@@ -30,6 +30,7 @@ type WebSocketClient struct {
 
 	HandshakeTimeout time.Duration
 	WriteTimeout     time.Duration
+	ReadLimit        int64
 }
 
 func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClient {
@@ -45,6 +46,7 @@ func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClie
 
 		HandshakeTimeout: 10 * time.Second,
 		WriteTimeout:     10 * time.Second,
+		ReadLimit:        1 << 14, // 16KB
 	}
 }
 
@@ -62,6 +64,9 @@ func (c *WebSocketClient) Dial() error {
 	if err != nil {
 		return &WebSocketError{Op: "dial", Err: err}
 	}
+
+	c.conn.SetReadLimit(c.ReadLimit)
+	c.conn.SetPingHandler(nil) // enable default ping handler
 
 	c.logger.Info().Msg("connection established")
 	return nil
