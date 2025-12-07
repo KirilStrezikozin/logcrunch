@@ -1,0 +1,16 @@
+package templates
+
+templ Tooltip(message, groupClassName, tooltipClassName string) {
+	<div class={ "relative group", groupClassName }>
+		{ children... }
+		<div
+			class={ `absolute left-1/2 -translate-x-1/2 top-8 opacity-0
+			pointer-events-none group-hover:opacity-100 transition-opacity
+			duration-100 delay-700 bg-[var(--primary)] border border-primary
+			text-xs rounded px-2 py-1 whitespace-nowrap z-100`,
+			tooltipClassName }
+		>
+			{ message }
+		</div>
+	</div>
+}
