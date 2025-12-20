@@ -1,218 +1,30 @@
+// Copyright 2025 The Logcrunch Authors. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
 package templates
 
 templ LogsDummy() {
-	<div class="w-full py-[48px]">
-		<table class="table-fixed w-full min-w-[720px]">
-			<thead class="sticky top-[48px] bg-[var(--primary)] h-[32px]">
-				<tr>
-					<th class="w-64 px-2 py-1 font-normal text-left">Time</th>
-					<th class="w-24 px-2 py-1 font-normal text-left">Level</th>
-					<th class="w-full px-2 py-1 font-normal text-left">Message</th>
-				</tr>
-			</thead>
-			<div class="fixed w-full top-[79px] h-[1px] border-t border-primary z-10"></div>
-			<tbody id="logs-table" class="min-h-full max-h-full overflow-y-auto min-w-inherit">
-				<tr class="hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:00</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">This is a dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:01</td>
-					<td class="px-2 py-1">ERROR</td>
-					<td class="px-2 py-1">This is another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:02</td>
-					<td class="px-2 py-1">DEBUG</td>
-					<td class="px-2 py-1">Yet another dummy log message.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:03</td>
-					<td class="px-2 py-1">WARN</td>
-					<td class="px-2 py-1">Dummy log message for warnings.</td>
-				</tr>
-				<tr class="border-t border-primary hover:bg-[var(--secondary)]">
-					<td class="px-2 py-1">2024-01-01 12:00:04</td>
-					<td class="px-2 py-1">INFO</td>
-					<td class="px-2 py-1">Final dummy log message.</td>
-				</tr>
-			</tbody>
-		</table>
+	<div class="w-full py-[48px] min-w-[720px]">
+		<div
+			class="sticky top-[48px] grid log-grid gap-2 bg-[var(--primary)]
+			border-b border-t border-primary"
+		>
+			<div class="px-2 py-1 font-normal text-left">Time</div>
+			<div class="px-2 py-1 font-normal text-left">Level</div>
+			<div class="px-2 py-1 font-normal text-left">Message</div>
+		</div>
+		<div id="logs-table" class="flex flex-col">
+			for _ = range 40 {
+				<div
+					class="grid log-grid gap-2 border-b border-primary
+					hover:bg-[var(--secondary)]"
+				>
+					<div class="px-2 py-1 tabular-nums">2024-01-01 12:00:00</div>
+					<div class="px-2 py-1">DEBUG</div>
+					<div class="px-2 py-1">This is a dummy log message.</div>
+				</div>
+			}
+		</div>
 	</div>
 }

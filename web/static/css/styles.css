@@ -126,6 +126,9 @@
   .focus-within-noring {
     @apply focus-visible:ring-0 focus-visible:outline-none;
   }
+  .log-grid {
+    grid-template-columns: 14rem 5rem 1fr;
+  }
 }
 
 ::-webkit-scrollbar {
