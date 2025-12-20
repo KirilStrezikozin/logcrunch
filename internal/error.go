@@ -6,5 +6,7 @@ package internal
 
 import "errors"
 
-var ErrNilConnection = errors.New("nil connection")
-var ErrConnectionAlreadyEstablished = errors.New("connection already established")
+var (
+	ErrNilConnection                = errors.New("nil connection")
+	ErrConnectionAlreadyEstablished = errors.New("connection already established")
+)

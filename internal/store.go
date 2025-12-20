@@ -5,6 +5,7 @@
 package internal
 
 // TODO: there could be a number of logs that we store in memory, and the rest is stored in a db.
+// TODO: use RWMutext
 
 type Store struct {
 	logs           []Log

@@ -1,7 +1,0 @@
-package templates
-
-import "github.com/KirilStrezikozin/logcrunch/internal"
-
-templ Log(log internal.Log) {
-	<p>[{ log.ID }] { log.Level }: { log.Message }</p>
-}

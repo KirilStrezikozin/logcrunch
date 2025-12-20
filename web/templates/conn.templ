@@ -1,0 +1,50 @@
+// Copyright 2025 The Logcrunch Authors. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
+package templates
+
+import "github.com/KirilStrezikozin/logcrunch/internal/types"
+
+const ConnectionURLInputName = "connection-url-input"
+
+templ ConnectionStatus(status types.ConnectionStatus) {
+	{{
+		var statusColor string
+		switch status {
+		case types.ConnectionStatusConnecting:
+			statusColor = "bg-yellow-500 border-yellow-500"
+		case types.ConnectionStatusConnected:
+			statusColor = "bg-green-500 border-green-500"
+		case types.ConnectionStatusError:
+			statusColor = "bg-red-500 border-red-500"
+		default:
+			statusColor = "bg-[var(--border-primary)] border-primary"
+		}
+	}}
+	<div
+		class={ "mx-2 w-2 h-4 rounded border-2", statusColor }
+		hx-swap="outerHTML"
+		hx-trigger="every 1s"
+		hx-get={ types.EndpointGetConnectionStatus }
+	></div>
+}
+
+templ ConnectionURLInput(value string, firstLoad bool) {
+	<input
+		name={ ConnectionURLInputName }
+		class="focus-within-noring py-1 px-2 flex-1 w-full"
+		type="text"
+		placeholder="Enter connection URL"
+		autocomplete
+		value={ value }
+		if firstLoad {
+			hx-trigger="load"
+			hx-get={ types.EndpointGetConnectionURL }
+			hx-swap="outerHTML"
+		} else {
+			hx-trigger="keyup[key=='Enter'] throttle:1000ms"
+			hx-post={ types.EndpointPostConnectionURL }
+		}
+	/>
+}

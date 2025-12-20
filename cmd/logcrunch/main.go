@@ -13,8 +13,7 @@ import (
 	"time"
 
 	"github.com/KirilStrezikozin/logcrunch/internal"
-	"github.com/KirilStrezikozin/logcrunch/web/templates"
-	"github.com/a-h/templ"
+	"github.com/KirilStrezikozin/logcrunch/internal/types"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	_ "github.com/joho/godotenv/autoload"
@@ -73,24 +72,27 @@ func main() {
 		Logger: &logger,
 	})
 
+	h := internal.NewHandler(logger)
+
 	r := chi.NewRouter()
 	r.Use(reqLogger)
 
-	fs := http.FileServer(http.Dir("web/static"))
-	r.Handle("/static/*", http.StripPrefix("/static/", fs))
+	r.Handle(types.EndpointStatic, h.Static())
+	r.Handle(types.EndpontIndex, h.Index())
+
+	r.Get(types.EndpointGetConnectionStatus, h.GetConnectionStatus)
+	r.Get(types.EndpointGetConnectionURL, h.GetConnectionURL)
+	r.Post(types.EndpointPostConnectionURL, h.PostConnectionURL)
 
 	r.HandleFunc("/unread", func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		dataComponent := templates.Logs(s.GetUnreadLogs(1))
-		err := dataComponent.Render(ctx, w)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+		// ctx := r.Context()
+		// dataComponent := templates.Logs(s.GetUnreadLogs(1))
+		// err := dataComponent.Render(ctx, w)
+		// if err != nil {
+		// 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		// 	return
+		// }
 	})
-
-	homeComponent := templates.Home("Logcrunch!")
-	r.Handle("/", templ.Handler(homeComponent))
 
 	server := http.Server{
 		Addr:         serveHost + ":" + servePort,

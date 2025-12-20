@@ -18,10 +18,12 @@ import (
 
 var upgrader = websocket.Upgrader{HandshakeTimeout: 10 * time.Second}
 
-const pongWait = 10 * time.Second
-const pingPeriod = (pongWait * 9) / 10
-const maxMessageSize = 1 << 14
-const writeWait = 10 * time.Second
+const (
+	pongWait       = 10 * time.Second
+	pingPeriod     = (pongWait * 9) / 10
+	maxMessageSize = 1 << 14
+	writeWait      = 10 * time.Second
+)
 
 func ws(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)

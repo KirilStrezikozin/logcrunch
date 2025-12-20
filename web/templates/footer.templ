@@ -1,4 +1,10 @@
+// Copyright 2025 The Logcrunch Authors. All rights reserved.
+// Use of this source code is governed by a MIT license
+// that can be found in the LICENSE file.
+
 package templates
+
+import "github.com/KirilStrezikozin/logcrunch/internal/types"
 
 templ Footer() {
 	<div
@@ -7,26 +13,14 @@ templ Footer() {
 	>
 		<div class="text-xl font-semibold italic px-4 py-1">logcrunch</div>
 		<div class="py-1">
-			<div
-				class="group flex items-center gap-2 border border-primary
-				rounded"
-			>
+			<div class="group flex items-center gap-2 border border-primary rounded">
 				@Tooltip(
 					"Data source. WebSocket connection URL to accept logs from",
 					"flex-1",
 					"-translate-x-1/2 top-0 -translate-y-2/1 whitespace-pre-line") {
-					<input
-						class="focus-within-noring py-1 px-2 flex-1"
-						id="connection-url"
-						type="text"
-						placeholder="Enter connection URL"
-					/>
+					@ConnectionURLInput("", true)
 				}
-				<div
-					id="connection-status"
-					class="mx-2 w-2 h-4 rounded border-2 border-primary
-					bg-[var(--border-primary)]"
-				></div>
+				@ConnectionStatus(types.ConnectionStatusDisconnected)
 			</div>
 		</div>
 	</div>
