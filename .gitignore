@@ -19,7 +19,6 @@
 !.pre-commit-config.yaml
 
 !*.go
-*_templ.go
 !*.templ
 !*.js
 !./web/static/css/styles.css
@@ -38,3 +37,6 @@
 
 # ...even if they are in subdirectories
 !*/
+
+# Except generated Go template files
+*_templ.go
