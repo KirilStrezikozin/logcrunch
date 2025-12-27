@@ -12,7 +12,7 @@ import (
 
 func TestNewLog_Unmarshal(t *testing.T) {
 	jsonData := `{
-		"id": "log1",
+		"id": 1,
 		"timestamp": 123456,
 		"level": "info",
 		"message": "hello world",
@@ -22,7 +22,7 @@ func TestNewLog_Unmarshal(t *testing.T) {
 		"function_call_started_at": 100.0,
 		"function_call_ended_at": 200.0,
 		"function_duration": 100.0,
-		"call_stack": ["log0"],
+		"call_stack": [1234],
 		"attrs": {
 			"user": "alice",
 			"count": 42,
@@ -36,7 +36,7 @@ func TestNewLog_Unmarshal(t *testing.T) {
 	log, err := NewLog([]byte(jsonData))
 	assert.NoError(t, err)
 
-	assert.Equal(t, LogID("log1"), log.ID)
+	assert.Equal(t, LogID(1), log.ID)
 	assert.Equal(t, Timestamp(123456), log.Timestamp)
 	assert.Equal(t, "info", log.Level)
 	assert.Equal(t, "hello world", log.Message)
@@ -45,7 +45,7 @@ func TestNewLog_Unmarshal(t *testing.T) {
 	assert.Equal(t, "Class.TestFunc", log.SourceFunction)
 	assert.Equal(t, Timestamp(100), log.FunctionCallStartedAt)
 	assert.Equal(t, Timestamp(200), log.FunctionCallEndedAt)
-	assert.Equal(t, []LogID{"log0"}, log.FunctionCallStack)
+	assert.Equal(t, []LogID{1234}, log.FunctionCallStack)
 
 	assert.Equal(t, "alice", log.Attrs["user"])
 	assert.Equal(t, float64(42), log.Attrs["count"])
@@ -53,7 +53,7 @@ func TestNewLog_Unmarshal(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, true, nested["flag"])
 
-	assert.Equal(t, LogID("log1"), log.parsedAttrs["id"])
+	assert.Equal(t, LogID(1), log.parsedAttrs["id"])
 	assert.Equal(t, "alice", log.parsedAttrs["attrs.user"])
 	assert.Equal(t, float64(42), log.parsedAttrs["attrs.count"])
 	assert.Equal(t, true, log.parsedAttrs["attrs.nested.flag"])
@@ -62,7 +62,7 @@ func TestNewLog_Unmarshal(t *testing.T) {
 
 func TestLog_Type(t *testing.T) {
 	infoLog := Log{
-		ID:        "1",
+		ID:        1,
 		Level:     "info",
 		Message:   "info message",
 		Timestamp: 123,
@@ -70,7 +70,7 @@ func TestLog_Type(t *testing.T) {
 	assert.Equal(t, LogTypeInfo, infoLog.Type())
 
 	metricLog := Log{
-		ID:                    "2",
+		ID:                    2,
 		Level:                 "info",
 		Message:               "metric message",
 		Timestamp:             123,
@@ -83,7 +83,7 @@ func TestLog_Type(t *testing.T) {
 func TestParseAttrsRecursive_Empty(t *testing.T) {
 	var log Log
 	log.parseAttrs()
-	assert.Equal(t, LogID(""), log.parsedAttrs["id"])
+	assert.Equal(t, LogID(0), log.parsedAttrs["id"])
 	assert.Equal(t, Timestamp(0), log.parsedAttrs["timestamp"])
 	assert.Nil(t, log.parsedAttrs["call_stack"])
 }

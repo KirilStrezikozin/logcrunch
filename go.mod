@@ -4,6 +4,7 @@ go 1.24.9
 
 require (
 	github.com/a-h/templ v0.3.865
+	github.com/boltdb/bolt v1.3.1
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1

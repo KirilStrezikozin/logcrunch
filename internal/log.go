@@ -10,7 +10,6 @@ import (
 )
 
 type (
-	LogID     string
 	Timestamp float64
 	LogType   int
 )
@@ -20,8 +19,14 @@ const (
 	LogTypeMetric
 )
 
+type LogID struct {
+	ProducerID     string `json:"producer_id"`
+	SequenceNumber int    `json:"sequence_number"`
+}
+
 type Log struct {
-	ID        LogID     `json:"id"`
+	ID LogID `json:"id"`
+
 	Timestamp Timestamp `json:"timestamp"`
 	Level     string    `json:"level"`
 	Message   string    `json:"message"`
@@ -68,7 +73,8 @@ func (l *Log) Type() LogType {
 func (l *Log) parseAttrs() {
 	parsed := make(map[string]any)
 
-	parsed["id"] = l.ID
+	parsed["id.producer_id"] = l.ID.ProducerID
+	parsed["id.sequence_number"] = l.ID.SequenceNumber
 	parsed["timestamp"] = l.Timestamp
 	parsed["level"] = l.Level
 	parsed["message"] = l.Message

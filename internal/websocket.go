@@ -6,11 +6,16 @@ package internal
 
 import (
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
+)
+
+const (
+	WebSocketReadLimit        = 1 << 14 // 16KB
+	WebSocketHandshakeTimeout = 10 * time.Second
+	WebSocketWriteTimeout     = 10 * time.Second
 )
 
 type WebSocketError struct {
@@ -22,9 +27,24 @@ func (e *WebSocketError) Error() string {
 	return fmt.Sprintf("websocket client %s error: %v", e.Op, e.Err)
 }
 
+type IWebSocketControl interface {
+	Dial(urlStr string) error
+	Close() error
+}
+
+type IWebSocketReader interface {
+	Read(onRead func(messageType int, p []byte)) error
+}
+
+type IWebSocketClient interface {
+	IWebSocketControl
+	IWebSocketReader
+}
+
+// XXX: WebSocketClient is not inherently thread-safe.
 type WebSocketClient struct {
-	url    url.URL
-	conn   *websocket.Conn
+	conn *websocket.Conn
+
 	logger zerolog.Logger
 
 	HandshakeTimeout time.Duration
@@ -32,23 +52,22 @@ type WebSocketClient struct {
 	ReadLimit        int64
 }
 
-func NewWebSocketClient(url url.URL, parentLogger zerolog.Logger) *WebSocketClient {
+func NewWebSocketClient(string, parentLogger zerolog.Logger) *WebSocketClient {
 	logger := parentLogger.
 		With().
-		Str("server", url.String()).
+		Str("component", "websocket_client").
 		Logger()
 
 	return &WebSocketClient{
 		logger: logger,
-		url:    url,
 
-		HandshakeTimeout: 10 * time.Second,
-		WriteTimeout:     10 * time.Second,
-		ReadLimit:        1 << 14, // 16KB
+		HandshakeTimeout: WebSocketHandshakeTimeout,
+		WriteTimeout:     WebSocketWriteTimeout,
+		ReadLimit:        WebSocketReadLimit,
 	}
 }
 
-func (c *WebSocketClient) Dial() error {
+func (c *WebSocketClient) Dial(urlStr string) error {
 	if c.conn != nil {
 		return &WebSocketError{Op: "dial", Err: ErrConnectionAlreadyEstablished}
 	}
@@ -58,7 +77,7 @@ func (c *WebSocketClient) Dial() error {
 	}
 
 	var err error
-	c.conn, _, err = dialer.Dial(c.url.String(), nil)
+	c.conn, _, err = dialer.Dial(urlStr, nil)
 	if err != nil {
 		return &WebSocketError{Op: "dial", Err: err}
 	}
@@ -66,23 +85,25 @@ func (c *WebSocketClient) Dial() error {
 	c.conn.SetReadLimit(c.ReadLimit)
 	c.conn.SetPingHandler(nil) // enable default ping handler
 
-	c.logger.Info().Msg("connection established")
+	c.logger.Debug().Str("server", urlStr).Msg("connection established")
 	return nil
 }
 
-func (c *WebSocketClient) Read(onRead func([]byte)) error {
+func (c *WebSocketClient) Read(onRead func(messageType int, p []byte)) error {
 	if c.conn == nil {
 		return &WebSocketError{Op: "read", Err: ErrNilConnection}
 	}
 
+	urlStr := c.conn.RemoteAddr().String()
+
 	for {
-		_, msg, err := c.conn.ReadMessage()
+		messageType, p, err := c.conn.ReadMessage()
 		if err != nil {
 			return &WebSocketError{Op: "read", Err: err}
 		}
 
-		c.logger.Info().Msgf("recv: %s", msg)
-		onRead(msg)
+		c.logger.Debug().Str("server", urlStr).Msg("message received")
+		onRead(messageType, p)
 	}
 }
 
@@ -97,11 +118,12 @@ func (c *WebSocketClient) Close() error {
 		return &WebSocketError{Op: "close", Err: err}
 	}
 
+	urlStr := c.conn.RemoteAddr().String()
 	if err := c.conn.Close(); err != nil {
 		return &WebSocketError{Op: "close", Err: err}
 	}
 
-	c.logger.Info().Msg("connection closed")
+	c.logger.Debug().Str("server", urlStr).Msg("connection closed")
 	c.conn = nil
 	return nil
 }

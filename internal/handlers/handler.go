@@ -2,7 +2,7 @@
 // Use of this source code is governed by a MIT license
 // that can be found in the LICENSE file.
 
-package internal
+package handlers
 
 import (
 	"net/http"
@@ -15,10 +15,10 @@ import (
 
 type Handler struct {
 	logger      zerolog.Logger
-	connService services.IConnection
+	connService services.IConnectionService
 }
 
-func NewHandler(logger zerolog.Logger, connService services.IConnection) *Handler {
+func New(logger zerolog.Logger, connService services.IConnectionService) *Handler {
 	return &Handler{
 		logger:      logger,
 		connService: connService,
@@ -36,8 +36,17 @@ func (h *Handler) Static() http.Handler {
 
 func (h *Handler) PostConnectionURL(w http.ResponseWriter, r *http.Request) {
 	value := r.FormValue(templates.ConnectionURLInputName)
-	if err := h.connService.SetURL(value); err != nil {
+	value, err := h.connService.SetURL(value)
+
+	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to set connection url")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
+
+	ctx := r.Context()
+	component := templates.ConnectionURLInput(value, false)
+	if err = component.Render(ctx, w); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -57,6 +66,8 @@ func (h *Handler) GetConnectionURL(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
+
+	h.connService.ConnectOnce() // Initial connection attempt.
 }
 
 func (h *Handler) GetConnectionStatus(w http.ResponseWriter, r *http.Request) {
